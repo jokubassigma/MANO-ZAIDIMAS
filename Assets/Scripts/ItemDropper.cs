@@ -36,11 +36,15 @@ public class ItemDropper : MonoBehaviour
             Debug.LogWarning("Object to drop is not assigned!");
         }
     }
-public GameObject spritePrefab; // Drag the sprite prefab you want to spawn into this field in the Unity Inspector
+    public GameObject spritePrefab; // Drag the sprite prefab you want to spawn into this field in the Unity Inspector
     public int maxSprites = 10; // Maximum number of sprites allowed
     public float spawnRadius = 5f; // Radius within which sprites can spawn
-
     private int currentSpriteCount = 0;
+    private float y;
+
+    public GameObject objectPrefab; // Prefab of the object to be placed
+    private GameObject currentObject; // Reference to the currently placed object
+    private bool canPlaceObject = true; // Flag to check if object can be placed
 
     void Update()
     {
@@ -56,7 +60,7 @@ public GameObject spritePrefab; // Drag the sprite prefab you want to spawn into
     void SpawnSprite()
     {
         Vector2 randomPosition = Random.insideUnitCircle * spawnRadius;
-        Vector3 spawnPosition = new Vector3(randomPosition.x, randomPosition.y, 0f) + transform.position;
+        Vector3 spawnPosition = new Vector3(randomPosition.x, y, 0f) + transform.position;
 
         // Check if there's no sprite at the spawn position
         Collider2D[] colliders = Physics2D.OverlapCircleAll(spawnPosition, 0f); // Adjust the radius as per your sprite size
