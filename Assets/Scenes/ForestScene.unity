@@ -1844,12 +1844,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f93b3276774757747a4e4dccad816bff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectToDrop: {fileID: 76514128405731923, guid: ce1eab17cf8b951478a3585c6f085c0f, type: 3}
-  dropForce: 5
   spritePrefab: {fileID: 76514128405731923, guid: ce1eab17cf8b951478a3585c6f085c0f, type: 3}
   maxSprites: 10
   spawnRadius: 1
-  objectPrefab: {fileID: 76514128405731923, guid: ce1eab17cf8b951478a3585c6f085c0f, type: 3}
+  y: 0
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 128
 --- !u!1001 &1354408268
 PrefabInstance:
   m_ObjectHideFlags: 0
