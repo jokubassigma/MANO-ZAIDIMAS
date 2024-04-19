@@ -532,6 +532,7 @@ GameObject:
   - component: {fileID: 336926258}
   - component: {fileID: 336926257}
   - component: {fileID: 336926256}
+  - component: {fileID: 336926259}
   m_Layer: 0
   m_Name: J+xa2S
   m_TagString: Untagged
@@ -546,7 +547,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 336926255}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 35c6a32ee6c87684f89992146e0e1966, type: 3}
   m_Name: 
@@ -626,6 +627,23 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &336926259
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 336926255}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23b94728018a3df44ba1ece640562820, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _movementSpeed: 3
+  _aggroRange: 5.91
+  _attackRange: 1.68
+  _waitTime: 2
+  _playerDetected: 0
 --- !u!1001 &445093662
 PrefabInstance:
   m_ObjectHideFlags: 0
