@@ -12,28 +12,34 @@ public class NPCStateManager : MonoBehaviour
     public float _attackRange;
     public float _waitTime;
 
+    [SerializeField] private Vector2 movementBounds;
+    [SerializeField] private float startY;
+    [SerializeField] private float endY;
+
     private NPCState currentNPCState;
     private Transform playerTransform;
     private Vector2 roamDestination;
     [SerializeField] private bool _playerDetected;
 
+    private bool appearing = false;
+
     private void Start()
     {
-        currentNPCState = NPCState.Roam;
+        currentNPCState = NPCState.Hide;
         playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
 
-        roamDestination = GetRandomPoint();
+        transform.position = new Vector3(transform.position.x, startY, transform.position.z);
     }
 
     private void Update()
     {
         UpdateState();
 
-        switch(currentNPCState)
+        switch (currentNPCState)
         {
             case NPCState.Roam:
                 StartCoroutine(MoveTowardsRandomPoint());
-                    break;
+                break;
             case NPCState.ChasePlayer:
                 ChasePlayer();
                 break;
@@ -41,16 +47,26 @@ public class NPCStateManager : MonoBehaviour
                 AttackPlayer();
                 break;
             case NPCState.Hide:
-                Hide();
+                if (!appearing)
+                {
+                    AppearFromGround();
+                }
+
                 break;
             default:
                 break;
         }
     }
 
-    private void Hide()
+    private void AppearFromGround()
     {
-        //insert logic
+        appearing = true;
+        transform.LeanMoveY(endY, 3f).setEaseOutQuad().setOnComplete(() =>
+        {
+            appearing = false;
+            currentNPCState = NPCState.Roam;
+            roamDestination = GetRandomPoint();
+        });
     }
 
     private void AttackPlayer()
@@ -61,7 +77,8 @@ public class NPCStateManager : MonoBehaviour
 
     private void ChasePlayer()
     {
-        transform.position = Vector2.MoveTowards(transform.position, playerTransform.position, _movementSpeed * Time.deltaTime);
+        transform.position =
+            Vector2.MoveTowards(transform.position, playerTransform.position, _movementSpeed * Time.deltaTime);
     }
 
     private IEnumerator MoveTowardsRandomPoint()
@@ -72,18 +89,25 @@ public class NPCStateManager : MonoBehaviour
         {
             yield return new WaitForSeconds(_waitTime);
             roamDestination = GetRandomPoint();
-            transform.position = Vector2.MoveTowards(transform.position, roamDestination, _movementSpeed * Time.deltaTime);
+            transform.position =
+                Vector2.MoveTowards(transform.position, roamDestination, _movementSpeed * Time.deltaTime);
         }
     }
 
     private Vector2 GetRandomPoint()
     {
-        return new Vector2(UnityEngine.Random.Range(-5f, 5f), transform.position.y);
+        return new Vector2(UnityEngine.Random.Range(movementBounds.x, movementBounds.y), transform.position.y);
     }
 
     private void UpdateState()
     {
-        RaycastHit2D hit = Physics2D.CircleCast(transform.position, _aggroRange, Vector2.zero, 0f, LayerMask.GetMask("Player"));
+        if (currentNPCState == NPCState.Hide)
+        {
+            return;
+        }
+
+        RaycastHit2D hit = Physics2D.CircleCast(transform.position, _aggroRange, Vector2.zero, 0f,
+            LayerMask.GetMask("Player"));
         if (hit.collider != null)
         {
             float distanceToPlayer = Vector2.Distance(transform.position, playerTransform.position);
@@ -97,13 +121,15 @@ public class NPCStateManager : MonoBehaviour
                 _playerDetected = false;
                 currentNPCState = NPCState.Roam;
             }
+
             if (distanceToPlayer <= _attackRange)
             {
                 currentNPCState = NPCState.AttackPlayer;
             }
         }
     }
-    private void OnDrawGizmosSelected()
+
+    private void OnDrawGizmos()
     {
         // Draw chase range
         Gizmos.color = Color.green;
@@ -113,5 +139,4 @@ public class NPCStateManager : MonoBehaviour
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, _attackRange);
     }
-
 }
