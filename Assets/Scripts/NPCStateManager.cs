@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -22,11 +22,14 @@ public class NPCStateManager : MonoBehaviour
 
     private bool appearing = false;
     private bool isRoaming = false;
+    private SpriteRenderer spriteRenderer;
+
     private void Start()
     {
         currentNPCState = NPCState.Hide;
         playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
         transform.position = new Vector3(transform.position.x, startY, transform.position.z);
+        spriteRenderer = GetComponent<SpriteRenderer>(); // Gauname SpriteRenderer komponentą
     }
 
     private void Update()
@@ -80,14 +83,32 @@ public class NPCStateManager : MonoBehaviour
     {
         transform.position =
             Vector2.MoveTowards(transform.position, playerTransform.position, _movementSpeed * Time.deltaTime);
+
+        // Patikriname, ar NPC juda į kairę ar dešinę ir sukame NPC transformaciją
+        if (transform.position.x < playerTransform.position.x) // Jei judama į kairę
+        {
+            spriteRenderer.flipX = true; // Sukame NPC į kairę
+        }
+        else if (transform.position.x > playerTransform.position.x) // Jei judama į dešinę
+        {
+            spriteRenderer.flipX = false; // Sukame NPC į dešinę
+        }
     }
 
     private IEnumerator MoveTowardsRandomPoint()
     {
         while (currentNPCState == NPCState.Roam)
         {
-            transform.position = Vector2.MoveTowards(transform.position, roamDestination, _movementSpeed * Time.deltaTime);
 
+            transform.position = Vector2.MoveTowards(transform.position, roamDestination, _movementSpeed * Time.deltaTime);
+            if (transform.position.x < roamDestination.x) // Jei judama į kairę
+            {
+                spriteRenderer.flipX = true; // Sukame NPC į kairę
+            }
+            else if (transform.position.x > roamDestination.x) // Jei judama į dešinę
+            {
+                spriteRenderer.flipX = false; // Sukame NPC į dešinę
+            }
             if (Vector2.Distance(transform.position, roamDestination) < 0.1f)
             {
                 yield return new WaitForSeconds(_waitTime);
@@ -146,7 +167,8 @@ public class NPCStateManager : MonoBehaviour
         if (isRoaming)
         {
             Gizmos.color = Color.cyan;
-            Gizmos.DrawLine(transform.position, roamDestination);  
+            Gizmos.DrawLine(transform.position, roamDestination);
         }
     }
+
 }

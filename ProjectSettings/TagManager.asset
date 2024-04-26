@@ -39,6 +39,9 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: zombielayer
+    uniqueID: 4047362075
+    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0
