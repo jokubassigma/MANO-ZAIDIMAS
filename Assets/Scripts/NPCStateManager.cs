@@ -2,8 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-//BUGAS - PASIMECIAU PATS TARP STATE'U, TAI PAUZE TARP ROAMING POINT'U VEIKIA PAGAL NUOTAIKA :D
+using Random = UnityEngine.Random;
 
 public class NPCStateManager : MonoBehaviour
 {
@@ -22,12 +21,11 @@ public class NPCStateManager : MonoBehaviour
     [SerializeField] private bool _playerDetected;
 
     private bool appearing = false;
-
+    private bool isRoaming = false;
     private void Start()
     {
         currentNPCState = NPCState.Hide;
         playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
-
         transform.position = new Vector3(transform.position.x, startY, transform.position.z);
     }
 
@@ -38,7 +36,11 @@ public class NPCStateManager : MonoBehaviour
         switch (currentNPCState)
         {
             case NPCState.Roam:
-                StartCoroutine(MoveTowardsRandomPoint());
+                if (!isRoaming)
+                {
+                    StartCoroutine(MoveTowardsRandomPoint());
+                    isRoaming = true;
+                }
                 break;
             case NPCState.ChasePlayer:
                 ChasePlayer();
@@ -51,7 +53,6 @@ public class NPCStateManager : MonoBehaviour
                 {
                     AppearFromGround();
                 }
-
                 break;
             default:
                 break;
@@ -83,15 +84,18 @@ public class NPCStateManager : MonoBehaviour
 
     private IEnumerator MoveTowardsRandomPoint()
     {
-        transform.position = Vector2.MoveTowards(transform.position, roamDestination, _movementSpeed * Time.deltaTime);
-
-        if (Vector2.Distance(transform.position, roamDestination) < 0.1f)
+        while (currentNPCState == NPCState.Roam)
         {
-            yield return new WaitForSeconds(_waitTime);
-            roamDestination = GetRandomPoint();
-            transform.position =
-                Vector2.MoveTowards(transform.position, roamDestination, _movementSpeed * Time.deltaTime);
+            transform.position = Vector2.MoveTowards(transform.position, roamDestination, _movementSpeed * Time.deltaTime);
+
+            if (Vector2.Distance(transform.position, roamDestination) < 0.1f)
+            {
+                yield return new WaitForSeconds(_waitTime);
+                roamDestination = GetRandomPoint();
+            }
+            yield return null;
         }
+        isRoaming = false;
     }
 
     private Vector2 GetRandomPoint()
@@ -138,5 +142,11 @@ public class NPCStateManager : MonoBehaviour
         // Draw attack range
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, _attackRange);
+
+        if (isRoaming)
+        {
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawLine(transform.position, roamDestination);  
+        }
     }
 }
